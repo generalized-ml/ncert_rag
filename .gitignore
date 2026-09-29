@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Data files (keep structure, ignore large binaries)
+data/vector_store/*.bin
+data/vector_store/*.pkl
+data/processed/*.json
+data/chunks/*.json
+data/evaluation/*.json
+
+# PDFs (large files — stored separately)
+dataset/pdfs/**/*.pdf
+
+# Logs
+logs/
+*.log
+
+# Model files
+models/
+*.gguf
+*.bin
+*.safetensors
+
+# Docker
+docker-compose.override.yml
+
+# OS
+Thumbs.db
