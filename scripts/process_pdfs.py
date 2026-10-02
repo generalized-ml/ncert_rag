@@ -17,6 +17,35 @@ import json
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
+import fitz # PyMuPDF
+
+def extract_and_chunk_pdf(pdf_path, chunk_size=1000, overlap=200):
+    # Open the document
+    doc = fitz.open(pdf_path)
+    chunks = []
+    
+    for page_num, page in enumerate(doc):
+        # Extract plain text from the page
+        text = page.get_text()
+        
+        # Slide across the extracted text to form chunks
+        start = 0
+        while start < len(text):
+            end = start + chunk_size
+            chunk_text = text[start:end]
+            
+            chunks.append({
+                "page": page_num + 1,
+                "text": chunk_text
+            })
+            
+            # Advance by chunk size minus overlap to preserve context
+            start += (chunk_size - overlap)
+            
+    return chunks
+
+
+
 def main():
     parser = argparse.ArgumentParser(description="Process NCERT PDFs for RAG")
     parser.add_argument("--subject", type=str, choices=["physics", "chemistry", "biology"],
@@ -69,9 +98,20 @@ def main():
         print(f"\nProcessing {len(pdf_files)} PDF(s) in folder: {folder.name}")
         for pdf_file in pdf_files:
             print(f"  - Processing PDF: {pdf_file.name}")
-            
+            chunks = extract_and_chunk_pdf(pdf_file)
+            print(f"    - Generated {len(chunks)} chunks.")
 
+            #save chunks as a json file in folder data/chunks/{folder.name}/{pdf_file.stem}.json
+            chunk_dir = Path(f"data/chunks/{folder.name}")
+            chunk_dir.mkdir(parents=True, exist_ok=True)
+            #loop over chunks and save each chunk as a json file in the chunk_dir with the name {pdf_file.stem}_{chunk_num}.json
+            for i, chunk in enumerate(chunks):
+                chunk_file = chunk_dir / f"{pdf_file.stem}_{i+1}.json"
+                with open(chunk_file, "w") as f:
+                    json.dump(chunk, f, indent=4)
+                print(f"    - Saved chunk {i+1} to {chunk_file}")
 
+            print(f"  - Finished processing PDF: {pdf_file.name}")
 
 
 if __name__ == "__main__":
