@@ -1,0 +1,18 @@
+
+{
+  "_description": "Mapping of NCERT PDF folders/files to class, subject, and part",
+
+
+"folders": {
+    "kebo1dd": { "class": 11, "subject": "biology",    "part": 1 },
+    "kech1dd": { "class": 11, "subject": "chemistry",  "part": 1 },
+    "kech2dd": { "class": 11, "subject": "chemistry",  "part": 2 },
+    "keph1dd": { "class": 11, "subject": "physics",    "part": 1 },
+    "keph2dd": { "class": 11, "subject": "physics",    "part": 2 },
+    "lebo1dd": { "class": 12, "subject": "biology",    "part": 1 },
+    "lech1dd": { "class": 12, "subject": "chemistry",  "part": 1 },
+    "lech2dd": { "class": 12, "subject": "chemistry",  "part": 2 },
+    "leph1dd": { "class": 12, "subject": "physics",    "part": 1 },
+    "leph2dd": { "class": 12, "subject": "physics",    "part": 2 }
+  }
+}
