@@ -11,6 +11,10 @@ import argparse
 import sys
 from pathlib import Path
 import os
+import faiss
+from sentence_transformers import SentenceTransformer
+import numpy as np
+import json
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
@@ -32,12 +36,37 @@ def main():
 
     #creating embeddings directory if it does not exist
     os.makedirs("data/embeddings", exist_ok=True)
-
+    
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
     #TODO: Implement embedding generation logic
     # 1. Load chunks from data/chunks/folder_name/*.json
     # 2. Generate embeddings using a model (e.g., OpenAI, SentenceTransformers)
     # 3. Store embeddings in a vector database (e.g., FAISS, Milvus, Pinecone)
-    # 4. Save metadata (e.g., class, subject, page number) alongside embeddings for retrieval
+    # 4. Save metadata (e.g., class, subject, chapter, page number) alongside embeddings for retrieval
+
+    for chunk_file in chunks_dir.glob("**/*.json"):
+        print(f"Processing {chunk_file.stem}...")
+        # Load the chunk data
+        with open(chunk_file, "r", encoding="utf-8") as f:
+            chunk_data = json.load(f)
+
+
+        # # Extract text from chunks
+        texts = chunk_data["text"]
+
+        # Generate embeddings in batches
+        embeddings = []
+        for i in range(0, len(texts), args.batch_size):
+            batch_texts = texts[i:i + args.batch_size]
+            batch_embeddings = model.encode(batch_texts)
+            embeddings.extend(batch_embeddings)
+
+        # Save embeddings to a file
+        embedding_file = Path("data/embeddings") / f"{chunk_file.stem}_embeddings.npy"
+        np.save(embedding_file, embeddings)
+        print(f"Saved embeddings to {embedding_file}")
+
+
 
 
     

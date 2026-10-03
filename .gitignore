@@ -40,7 +40,8 @@ data/vector_store/*.pkl
 data/processed/*.json
 data/chunks/*.json
 data/evaluation/*.json
-
+data/embeddings/*.npy
+data/*
 # PDFs (large files — stored separately)
 dataset/pdfs/**/*.pdf
 

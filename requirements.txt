@@ -6,6 +6,7 @@ pyyaml>=6.0
 pymupdf>=1.23.0
 pdfplumber>=0.10.0
 pypdf>=3.17.0
+pinecone-client>=2.2.0
 
 # Text Processing
 langchain>=0.1.0

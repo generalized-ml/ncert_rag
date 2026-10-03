@@ -52,10 +52,12 @@ embedding:
 
 # Vector store
 vector_store:
-  type: "chromadb"  # chromadb, faiss, qdrant
-  collection_name: "ncert_neet"
-  persist_directory: "data/vector_store"
-  distance_metric: "cosine"
+  type: "pinecone"  # pinecone, chromadb, faiss, qdrant
+  index_name: "ncert-neet"
+  cloud: "aws"
+  region: "us-east-1"
+  metric: "cosine"
+  dimensions: 384
 
 # Retrieval
 retrieval:
