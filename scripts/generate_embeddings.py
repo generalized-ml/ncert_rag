@@ -66,6 +66,10 @@ def main():
         np.save(embedding_file, embeddings)
         print(f"Saved embeddings to {embedding_file}")
 
+        #TODO: save embeddings which is of same dimensions independent of the number of tokens in a chunk. 
+        # The embeddings should be of fixed size for all chunks. Use a model that generates fixed-size embeddings.
+        
+
 
 
 
