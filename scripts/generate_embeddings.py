@@ -43,7 +43,6 @@ def main():
     # 2. Generate embeddings using a model (e.g., OpenAI, SentenceTransformers)
     # 3. Store embeddings in a vector database (e.g., FAISS, Milvus, Pinecone)
     # 4. Save metadata (e.g., class, subject, chapter, page number) alongside embeddings for retrieval
-
     for chunk_file in chunks_dir.glob("**/*.json"):
         print(f"Processing {chunk_file.stem}...")
         # Load the chunk data
@@ -59,22 +58,17 @@ def main():
         for i in range(0, len(texts), args.batch_size):
             batch_texts = texts[i:i + args.batch_size]
             batch_embeddings = model.encode(batch_texts)
-            embeddings.extend(batch_embeddings)
+            embeddings.append(batch_embeddings)
 
+        print(f"Generated {len(embeddings)} embeddings for {chunk_file.stem}")
+
+        #take mean of embeddings to get a single embedding for the chunk embeddings is a list of numpy arrays of shape (384,) 
+        # for each chunk. We will take mean of all the embeddings to get a single embedding of shape (384,) for the chunk
+        embeddings = np.mean(embeddings, axis=0)
         # Save embeddings to a file
         embedding_file = Path("data/embeddings") / f"{chunk_file.stem}_embeddings.npy"
         np.save(embedding_file, embeddings)
         print(f"Saved embeddings to {embedding_file}")
-
-        #TODO: save embeddings which is of same dimensions independent of the number of tokens in a chunk. 
-        # The embeddings should be of fixed size for all chunks. Use a model that generates fixed-size embeddings.
-        
-
-
-
-
-    
-
 
 if __name__ == "__main__":
     main()
