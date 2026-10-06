@@ -93,6 +93,8 @@ def build_metadata_entry(folder: str, pdf_stem: str, chunk_num: int, file_type: 
         "chapter": chapter,
         "class": info.get("class", "N/A"),
         "file_type": file_type,
+        "folder": folder,
+        "pdf_stem": pdf_stem,
     }
 
 
