@@ -44,7 +44,7 @@ CHUNKS_DIR = PROJECT_ROOT / "data" / "chunks"
 # These match rag_config.yaml
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 RERANKER_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-LLM_MODEL = "gpt-4o-mini"
+LLM_MODEL = os.getenv("OPENROUTER_CHAT_MODEL", "openai/gpt-4o-mini")
 LLM_TEMPERATURE = 0.1
 LLM_MAX_TOKENS = 1024
 TOP_K_RETRIEVE = 10  # fetch 10, then rerank
@@ -112,13 +112,26 @@ def _get_metadata() -> dict[int, dict]:
 
 
 def _get_openai_client():
-    """Lazy-load the OpenAI client (reads OPENAI_API_KEY from env)."""
+    """Lazy-load the OpenAI client, configured for OpenRouter."""
     global _openai_client
     if _openai_client is None:
         from openai import OpenAI
         from dotenv import load_dotenv
         load_dotenv(PROJECT_ROOT / ".env")
-        _openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        api_key = os.getenv("OPENROUTER_API_KEY")
+
+        if not api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY not set in .env file. "
+                "Get your key at https://openrouter.ai/keys"
+            )
+
+        _openai_client = OpenAI(
+            base_url=base_url,
+            api_key=api_key,
+        )
     return _openai_client
 
 
