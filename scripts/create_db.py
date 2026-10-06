@@ -134,7 +134,6 @@ def build_index() -> tuple:
         if emb.ndim == 1:
             emb = emb.reshape(1, -1)
 
-        print(emb.shape)
         all_embeddings.append(emb)
         metadata[idx] = build_metadata_entry(
             folder, parsed["pdf_stem"], parsed["chunk_num"], parsed["file_type"]
@@ -147,9 +146,6 @@ def build_index() -> tuple:
         sys.exit(1)
 
     print(f"Loaded {len(all_embeddings)} embedding arrays, total vectors: {idx}")
-
-    print(all_embeddings[0].shape)
-    print(all_embeddings[0])
 
     embeddings = np.vstack(all_embeddings)
     dim = embeddings.shape[1]

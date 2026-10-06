@@ -55,20 +55,14 @@ def main():
 
         # Generate embeddings in batches
         embeddings = []
-        for i in range(0, len(texts), args.batch_size):
-            batch_texts = texts[i:i + args.batch_size]
-            batch_embeddings = model.encode(batch_texts)
-            embeddings.append(batch_embeddings)
+        embeddings = model.encode(texts, batch_size=args.batch_size, show_progress_bar=True)
 
-        print(f"Generated {len(embeddings)} embeddings for {chunk_file.stem}")
-
-        #take mean of embeddings to get a single embedding for the chunk embeddings is a list of numpy arrays of shape (384,) 
-        # for each chunk. We will take mean of all the embeddings to get a single embedding of shape (384,) for the chunk
-        embeddings = np.mean(embeddings, axis=0)
         # Save embeddings to a file
         embedding_file = Path("data/embeddings") / f"{chunk_file.stem}_embeddings.npy"
         np.save(embedding_file, embeddings)
         print(f"Saved embeddings to {embedding_file}")
+    
+    print("Embedding generation completed.")
 
 if __name__ == "__main__":
     main()
