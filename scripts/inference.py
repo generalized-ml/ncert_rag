@@ -16,6 +16,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -271,7 +272,7 @@ def generate_answer(query: str, ranked_chunks: list[dict]) -> str:
 #  MAIN PIPELINE  (the only public function you need)
 # ═══════════════════════════════════════════════════════════════════════
 
-def answer_query(query: str, verbose: bool = False) -> str:
+def answer_query(query: str, verbose: bool = False) -> dict:
     """
     Full RAG pipeline: retrieve → rerank → generate.
 
@@ -280,15 +281,19 @@ def answer_query(query: str, verbose: bool = False) -> str:
         verbose: If True, print intermediate retrieval/rerank details.
 
     Returns:
-        The LLM-generated answer string.
+        dict with keys: answer, retrieval_time_s, rerank_time_s, generation_time_s, total_time_s
     """
+    t_start = time.perf_counter()
+
     # ── 1. Retrieve top-10 ──
     if verbose:
         print(f"\n{'='*60}")
         print(f"🔍 Query: {query}")
         print(f"{'='*60}\n📥 Retrieving top-{TOP_K_RETRIEVE} chunks …")
 
+    t0 = time.perf_counter()
     candidates = retrieve_top_k(query, top_k=TOP_K_RETRIEVE)
+    retrieval_time = time.perf_counter() - t0
 
     if verbose:
         print(f"\n{'─'*60}")
@@ -299,13 +304,21 @@ def answer_query(query: str, verbose: bool = False) -> str:
                   f"{c['class']!s:<7} {c['chapter']:<5}")
 
     if not candidates:
-        return "No relevant content found in the NCERT textbooks for your query."
+        return {
+            "answer": "No relevant content found in the NCERT textbooks for your query.",
+            "retrieval_time_s": round(retrieval_time, 3),
+            "rerank_time_s": 0.0,
+            "generation_time_s": 0.0,
+            "total_time_s": round(time.perf_counter() - t_start, 3),
+        }
 
     # ── 2. Re-rank ──
     if verbose:
         print(f"\n🔄 Re-ranking with cross-encoder …")
 
+    t0 = time.perf_counter()
     ranked = rerank_chunks(query, candidates, top_k=TOP_K_RERANK)
+    rerank_time = time.perf_counter() - t0
 
     if verbose:
         print(f"\n{'─'*60}")
@@ -320,8 +333,19 @@ def answer_query(query: str, verbose: bool = False) -> str:
     if verbose:
         print(f"\n🤖 Generating answer with {LLM_MODEL} …\n")
 
+    t0 = time.perf_counter()
     answer = generate_answer(query, ranked)
-    return answer
+    generation_time = time.perf_counter() - t0
+
+    total_time = time.perf_counter() - t_start
+
+    return {
+        "answer": answer,
+        "retrieval_time_s": round(retrieval_time, 3),
+        "rerank_time_s": round(rerank_time, 3),
+        "generation_time_s": round(generation_time, 3),
+        "total_time_s": round(total_time, 3),
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -360,11 +384,12 @@ def main():
                 break
             if not q:
                 continue
-            answer = answer_query(q, verbose=args.verbose)
-            print(f"\n{answer}\n")
+            result = answer_query(q, verbose=args.verbose)
+            print(f"\n{result['answer']}\n")
     elif args.query:
-        answer = answer_query(args.query, verbose=args.verbose)
-        print(answer)
+        result = answer_query(args.query, verbose=args.verbose)
+        print(f"\n⏱️  Time taken: {result['total_time_s']:.2f} seconds\n")
+        print(result["answer"])
     else:
         parser.print_help()
 
