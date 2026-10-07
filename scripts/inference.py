@@ -339,6 +339,7 @@ def answer_query(query: str, verbose: bool = False) -> dict:
 
     total_time = time.perf_counter() - t_start
 
+
     return {
         "answer": answer,
         "retrieval_time_s": round(retrieval_time, 3),
