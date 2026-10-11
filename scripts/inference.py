@@ -18,6 +18,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from opik import track
 
 import numpy as np
 
@@ -243,7 +244,6 @@ def _build_context(chunks: list[dict]) -> str:
         parts.append(f"{src}\n{ch['text']}")
     return "\n\n".join(parts)
 
-
 def generate_answer(query: str, ranked_chunks: list[dict]) -> str:
     """Call the LLM with the query and re-ranked context to produce an answer."""
     client = _get_openai_client()
@@ -271,7 +271,7 @@ def generate_answer(query: str, ranked_chunks: list[dict]) -> str:
 # ═══════════════════════════════════════════════════════════════════════
 #  MAIN PIPELINE  (the only public function you need)
 # ═══════════════════════════════════════════════════════════════════════
-
+@track
 def answer_query(query: str, verbose: bool = False) -> dict:
     """
     Full RAG pipeline: retrieve → rerank → generate.
@@ -310,6 +310,7 @@ def answer_query(query: str, verbose: bool = False) -> dict:
             "rerank_time_s": 0.0,
             "generation_time_s": 0.0,
             "total_time_s": round(time.perf_counter() - t_start, 3),
+            "contexts": [],
         }
 
     # ── 2. Re-rank ──
@@ -339,9 +340,11 @@ def answer_query(query: str, verbose: bool = False) -> dict:
 
     total_time = time.perf_counter() - t_start
 
+    contexts = [ch["text"] for ch in ranked]
 
     return {
         "answer": answer,
+        "contexts": contexts,
         "retrieval_time_s": round(retrieval_time, 3),
         "rerank_time_s": round(rerank_time, 3),
         "generation_time_s": round(generation_time, 3),
