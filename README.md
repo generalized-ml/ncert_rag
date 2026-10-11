@@ -2,6 +2,8 @@
 
 ![RAG Pipeline Architecture](doc/design/design_v01.png)
 
+# RAG Evaluation (Latest)
+![RAG Evaluation](doc/experiments/image_v_1.png)
 A **Retrieval-Augmented Generation (RAG)** system that answers NEET exam questions using NCERT textbooks (Class 11 & 12 — Physics, Chemistry, Biology).
 
 ## 📚 Data Sources
