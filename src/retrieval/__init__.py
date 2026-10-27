@@ -1,1 +1,0 @@
-"""Retrieval strategies: dense, sparse, and hybrid."""
